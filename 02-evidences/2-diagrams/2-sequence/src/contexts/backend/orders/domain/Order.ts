@@ -1,3 +1,4 @@
+import { AggregateRoot } from "@/contexts/shared/domain/AggregateRoot";
 import {
 	type Currency,
 	Money,
@@ -6,6 +7,7 @@ import {
 
 import { OrderId } from "./OrderId";
 import { OrderLine, type OrderLinePrimitives } from "./OrderLine";
+import { OrderPlacedDomainEvent } from "./OrderPlacedDomainEvent";
 
 export type OrderPrimitives = {
 	id: string;
@@ -17,7 +19,7 @@ export type OrderPrimitives = {
 	lines: OrderLinePrimitives[];
 };
 
-export class Order {
+export class Order extends AggregateRoot {
 	constructor(
 		readonly id: OrderId,
 		readonly userId: string,
@@ -26,7 +28,9 @@ export class Order {
 		readonly status: string,
 		readonly subtotal: Money,
 		readonly lines: OrderLine[],
-	) {}
+	) {
+		super();
+	}
 
 	static place(
 		id: string,
@@ -41,7 +45,7 @@ export class Order {
 			0,
 		);
 
-		return new Order(
+		const order = new Order(
 			new OrderId(id),
 			userId,
 			createdAt,
@@ -50,6 +54,10 @@ export class Order {
 			new Money(subtotal, currency),
 			lines,
 		);
+
+		order.record(new OrderPlacedDomainEvent(order.id.value, userId));
+
+		return order;
 	}
 
 	static fromPrimitives(primitives: OrderPrimitives): Order {

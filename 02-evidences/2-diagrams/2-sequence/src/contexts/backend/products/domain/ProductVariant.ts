@@ -40,21 +40,6 @@ export class ProductVariant {
 		return this.onlineStock > 0;
 	}
 
-	hasStockFor(quantity: number): boolean {
-		return this.onlineStock >= quantity;
-	}
-
-	withStockDecreasedBy(quantity: number): ProductVariant {
-		return new ProductVariant(
-			this.id,
-			this.color,
-			this.colorHex,
-			this.size,
-			this.onlineStock - quantity,
-			this.measurements,
-		);
-	}
-
 	isLowStock(): boolean {
 		return this.onlineStock <= lowStockThreshold;
 	}
