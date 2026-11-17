@@ -26,6 +26,8 @@ npm run test:integration
 
 ```
 docs/
-└── architecture/
-    └── domain-and-application-do-not-read-the-system-time.md
+├── architecture/
+│   └── domain-and-application-do-not-read-the-system-time.md
+└── code-quality/
+    └── code-reveals-its-intent.md
 ```
