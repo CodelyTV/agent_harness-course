@@ -1,7 +1,9 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
+import { addOrderToCart } from "@/app/actions/checkout/addOrderToCart";
 import { retailContainer } from "@/contexts/backend/shared/infrastructure/RetailContainer";
+import { Button } from "@/contexts/frontend/design-system/atoms/Button";
 import {
 	formatDeliveryMethod,
 	formatMoney,
@@ -40,6 +42,12 @@ export default async function AccountOrderDetailPage({
 			</Link>
 			<header className={styles.header}>
 				<h1 className={styles.title}>{order.id}</h1>
+				<form action={addOrderToCart}>
+					<input type="hidden" name="orderId" value={order.id} />
+					<Button type="submit" size="small">
+						Buy again
+					</Button>
+				</form>
 			</header>
 
 			<div className={styles.summary}>

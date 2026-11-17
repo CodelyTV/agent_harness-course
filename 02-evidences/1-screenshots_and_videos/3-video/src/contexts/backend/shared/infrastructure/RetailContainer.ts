@@ -1,4 +1,5 @@
 import { CartVariantAdder } from "@/contexts/backend/checkout/application/add/CartVariantAdder";
+import { CartOrderAdder } from "@/contexts/backend/checkout/application/add-order/CartOrderAdder";
 import { CheckoutConfirmer } from "@/contexts/backend/checkout/application/confirm/CheckoutConfirmer";
 import { CartItemCounter } from "@/contexts/backend/checkout/application/count/CartItemCounter";
 import { CartVariantRemover } from "@/contexts/backend/checkout/application/remove/CartVariantRemover";
@@ -125,6 +126,14 @@ class RetailContainer {
 		return new CartVariantAdder(
 			this.checkoutRepository,
 			this.productRepository,
+			this.currentUserProviderInstance,
+		);
+	}
+
+	get cartOrderAdder(): CartOrderAdder {
+		return new CartOrderAdder(
+			this.orderRepository,
+			this.cartVariantAdder,
 			this.currentUserProviderInstance,
 		);
 	}
