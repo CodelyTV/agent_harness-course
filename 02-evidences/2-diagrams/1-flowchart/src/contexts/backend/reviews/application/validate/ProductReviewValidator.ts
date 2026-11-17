@@ -4,6 +4,8 @@ import { ProductReviewFinder } from "../../domain/ProductReviewFinder";
 import type { ProductReviewRepository } from "../../domain/ProductReviewRepository";
 import type { ProductReviewSpamDetector } from "../../domain/ProductReviewSpamDetector";
 
+const trustedAuthorPublishedReviews = 3;
+
 export class ProductReviewValidator {
 	private readonly finder: ProductReviewFinder;
 
@@ -22,7 +24,11 @@ export class ProductReviewValidator {
 			return;
 		}
 
-		if (await this.spamDetector.isSpam(review)) {
+		const isSpam =
+			!(await this.isTrustedAuthor(review.userId)) &&
+			(await this.spamDetector.isSpam(review));
+
+		if (isSpam) {
 			review.markAsSpam();
 		} else {
 			review.publish();
@@ -30,5 +36,12 @@ export class ProductReviewValidator {
 
 		await this.repository.save(review);
 		await this.eventBus.publish(review.pullDomainEvents());
+	}
+
+	private async isTrustedAuthor(userId: string): Promise<boolean> {
+		const publishedReviews =
+			await this.repository.countPublishedByUser(userId);
+
+		return publishedReviews >= trustedAuthorPublishedReviews;
 	}
 }

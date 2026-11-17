@@ -7,4 +7,6 @@ export abstract class ProductReviewRepository {
 	abstract search(id: ProductReviewId): Promise<ProductReview | null>;
 
 	abstract searchByProduct(productId: string): Promise<ProductReview[]>;
+
+	abstract countPublishedByUser(userId: string): Promise<number>;
 }
