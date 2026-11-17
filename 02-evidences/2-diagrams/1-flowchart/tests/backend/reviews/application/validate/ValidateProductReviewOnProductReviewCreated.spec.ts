@@ -38,6 +38,7 @@ describe("ValidateProductReviewOnProductReviewCreated should", () => {
 			status: "pending-validation",
 		});
 		repository.searchShouldReturn(ProductReviewMother.create(pending));
+		repository.countPublishedByUserShouldReturn(0);
 		spamDetector.isSpamShouldReturn(false);
 
 		await subscriber.on(createdEventFor(pending));
@@ -55,6 +56,7 @@ describe("ValidateProductReviewOnProductReviewCreated should", () => {
 			status: "pending-validation",
 		});
 		repository.searchShouldReturn(ProductReviewMother.create(pending));
+		repository.countPublishedByUserShouldReturn(0);
 		spamDetector.isSpamShouldReturn(true);
 
 		await subscriber.on(createdEventFor(pending));
@@ -63,6 +65,21 @@ describe("ValidateProductReviewOnProductReviewCreated should", () => {
 			ProductReviewMother.create({ ...pending, status: "spam" }),
 		);
 		eventBus.expectPublishToHaveBeenCalledWith([]);
+	});
+
+	it("publish a review of a trusted author without the spam detector", async () => {
+		const pending = ProductReviewMother.createPrimitives({
+			status: "pending-validation",
+		});
+		repository.searchShouldReturn(ProductReviewMother.create(pending));
+		repository.countPublishedByUserShouldReturn(3);
+
+		await subscriber.on(createdEventFor(pending));
+
+		spamDetector.expectIsSpamNotToHaveBeenCalled();
+		repository.expectSaveToHaveBeenCalledWith(
+			ProductReviewMother.create({ ...pending, status: "published" }),
+		);
 	});
 
 	it("ignore a review that was already validated", async () => {

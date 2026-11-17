@@ -64,6 +64,16 @@ export class PostgresProductReviewRepository
 		return rows.map((row) => this.toProductReview(row));
 	}
 
+	async countPublishedByUser(userId: string): Promise<number> {
+		const [row] = await this.sql<Array<{ total: number }>>`
+			select count(*)::int as total
+			from product_reviews
+			where user_id = ${userId} and status = 'published'
+		`;
+
+		return row.total;
+	}
+
 	private toProductReview(row: ProductReviewRow): ProductReview {
 		return ProductReview.fromPrimitives({
 			id: row.id,

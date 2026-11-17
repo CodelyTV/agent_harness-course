@@ -152,5 +152,33 @@ describeWithEnvironmentArranger(
 				"review-cccc3333",
 			]);
 		});
+
+		it("count only the published reviews of a customer", async () => {
+			await seedUsersAndProduct();
+			const published = ProductReview.create(
+				"review-eeee5555",
+				"p1",
+				"user-other",
+				5,
+				"Love it",
+				null,
+				new Date().toISOString(),
+			);
+			published.publish();
+			await repository.save(published);
+			await repository.save(
+				ProductReview.create(
+					"review-ffff6666",
+					"p1",
+					"user-other",
+					4,
+					"Waiting for validation",
+					null,
+					new Date().toISOString(),
+				),
+			);
+
+			expect(await repository.countPublishedByUser("user-other")).toBe(1);
+		});
 	},
 );
