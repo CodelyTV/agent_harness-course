@@ -1,0 +1,110 @@
+{
+  "version": 2,
+  "skills": {
+    "conventions-to-rules": {
+      "source": "codelytv/agent-harness",
+      "commit": "1f97f23f6b5ca53444c0606c48e23a8443b03a16",
+      "sourceType": "github",
+      "skillPath": ".agents/skills/conventions-to-rules/SKILL.md",
+      "computedHash": "58cb3cf552df2e4e0831e2b8749a2dd010d4078053a7cd3a1640161f7d25fab7"
+    },
+    "create-doc": {
+      "source": "codelytv/agent-harness",
+      "commit": "1f97f23f6b5ca53444c0606c48e23a8443b03a16",
+      "sourceType": "github",
+      "skillPath": ".agents/skills/create-doc/SKILL.md",
+      "computedHash": "3fae66a9dc208b246a7d5d50a7240c1b633a21f23cc1384452955bfcb3ce6afc"
+    },
+    "create-plan": {
+      "source": "codelytv/agent-harness",
+      "commit": "1f97f23f6b5ca53444c0606c48e23a8443b03a16",
+      "sourceType": "github",
+      "skillPath": ".agents/skills/create-plan/SKILL.md",
+      "computedHash": "57b08289cfcc650dd51785a8dd2df504739f37e62eb267d853de37d1106cd475"
+    },
+    "create-plan-github": {
+      "source": "codelytv/agent-harness",
+      "commit": "1f97f23f6b5ca53444c0606c48e23a8443b03a16",
+      "sourceType": "github",
+      "skillPath": ".agents/skills/create-plan-github/SKILL.md",
+      "computedHash": "cd7bc3b7813de616810ff02ef0e4646ec0720900c362b74d996226c4193b3186"
+    },
+    "create-plan-gitlab": {
+      "source": "codelytv/agent-harness",
+      "commit": "1f97f23f6b5ca53444c0606c48e23a8443b03a16",
+      "sourceType": "github",
+      "skillPath": ".agents/skills/create-plan-gitlab/SKILL.md",
+      "computedHash": "a8c9a7e3add3e7ea0cd5db8f2dd75ad631986772a3540822eb3c8fb6ca90745f"
+    },
+    "create-plan-subagents": {
+      "source": "codelytv/agent-harness",
+      "commit": "1f97f23f6b5ca53444c0606c48e23a8443b03a16",
+      "sourceType": "github",
+      "skillPath": ".agents/skills/create-plan-subagents/SKILL.md",
+      "computedHash": "cda17f94838ad10a69fc8318bf0fa1449595101d9b3d00ed8e9cef314550a09f"
+    },
+    "create-pull-request": {
+      "source": "codelytv/agent-harness",
+      "commit": "1f97f23f6b5ca53444c0606c48e23a8443b03a16",
+      "sourceType": "github",
+      "skillPath": ".agents/skills/create-pull-request/SKILL.md",
+      "computedHash": "10a801359784dd47b9c34e7cee99cde31f8b0d323c90ea4c045fe468366ac1ee"
+    },
+    "create-rule": {
+      "source": "codelytv/agent-harness",
+      "commit": "1f97f23f6b5ca53444c0606c48e23a8443b03a16",
+      "sourceType": "github",
+      "skillPath": ".agents/skills/create-rule/SKILL.md",
+      "computedHash": "e1e3702c6c40533401879f0224e393661fb5d44fdd57b411634c5716ea3b3b4b"
+    },
+    "deterministify": {
+      "source": "codelytv/agent-harness",
+      "commit": "1f97f23f6b5ca53444c0606c48e23a8443b03a16",
+      "sourceType": "github",
+      "skillPath": ".agents/skills/deterministify/SKILL.md",
+      "computedHash": "b961e79b5dfb4e855ec1a2ae43f18c9029acf33213f83fc99dc683dc19c7aa79"
+    },
+    "docs-to-rules": {
+      "source": "codelytv/agent-harness",
+      "commit": "1f97f23f6b5ca53444c0606c48e23a8443b03a16",
+      "sourceType": "github",
+      "skillPath": ".agents/skills/docs-to-rules/SKILL.md",
+      "computedHash": "1893f91cf17561c79d9181ec6d3b9cc3b2b7e8bce6f3a9d130a7e78f8bea4dc2"
+    },
+    "git-commit": {
+      "source": "codelytv/agent-harness",
+      "commit": "1f97f23f6b5ca53444c0606c48e23a8443b03a16",
+      "sourceType": "github",
+      "skillPath": ".agents/skills/git-commit/SKILL.md",
+      "computedHash": "f84f80dfaf1ce5723d0d929264332eabe3ac54d2c614424b2762586e0f2270c5"
+    },
+    "implement-plan-phase": {
+      "source": "codelytv/agent-harness",
+      "commit": "1f97f23f6b5ca53444c0606c48e23a8443b03a16",
+      "sourceType": "github",
+      "skillPath": ".agents/skills/implement-plan-phase/SKILL.md",
+      "computedHash": "3c2930374078ce7b90a6a09b63d5c0a01c3568e47e26adcf578c7fff0e376edd"
+    },
+    "implement-plan-phase-github": {
+      "source": "codelytv/agent-harness",
+      "commit": "1f97f23f6b5ca53444c0606c48e23a8443b03a16",
+      "sourceType": "github",
+      "skillPath": ".agents/skills/implement-plan-phase-github/SKILL.md",
+      "computedHash": "b1d8f11fb5ea01eda5ee6fee6bf0b9bf91c41eff01d89e5ef1f8a6a8c95775fa"
+    },
+    "implement-plan-phase-gitlab": {
+      "source": "codelytv/agent-harness",
+      "commit": "1f97f23f6b5ca53444c0606c48e23a8443b03a16",
+      "sourceType": "github",
+      "skillPath": ".agents/skills/implement-plan-phase-gitlab/SKILL.md",
+      "computedHash": "9f1bd18462f735e72e274f9c1b0589db6001a632707e83de6780d9575f028a67"
+    },
+    "openspec-create-spec-from-code": {
+      "source": "codelytv/agent-harness",
+      "commit": "1f97f23f6b5ca53444c0606c48e23a8443b03a16",
+      "sourceType": "github",
+      "skillPath": ".agents/skills/openspec-create-spec-from-code/SKILL.md",
+      "computedHash": "bfff1388a2b95a34ffa360d30c4969a636b169546ccf72e78ff608a5d650017e"
+    }
+  }
+}
