@@ -20,7 +20,7 @@ const template = `<!doctype html>
 							<td>
 								<p style="margin: 0 0 8px; font-size: 12px; letter-spacing: 2px; color: #6b7280;">CODELY ATELIER</p>
 								<h1 style="margin: 0 0 16px; font-size: 24px;">Thanks for your order</h1>
-								<p style="margin: 0 0 16px; font-size: 16px; line-height: 1.5;">Hi {{customerName}}, we received your order <strong>{{orderId}}</strong>. We will send its {{items}} items to your home.</p>
+								<p style="margin: 0 0 16px; font-size: 16px; line-height: 1.5;">Hi {{customerName}}, we received your order <strong>{{orderId}}</strong>. We will send {{items}} to your home.</p>
 								<p style="margin: 0; font-size: 18px; font-weight: bold;">Total: {{total}}</p>
 							</td>
 						</tr>
@@ -47,7 +47,7 @@ export function orderConfirmationEmail(
 		html: render({
 			customerName: params.customerName,
 			orderId: params.orderId,
-			items: String(params.items),
+			items: params.items === 1 ? "1 item" : `${params.items} items`,
 			total: new Intl.NumberFormat("en-GB", {
 				style: "currency",
 				currency: params.currency,

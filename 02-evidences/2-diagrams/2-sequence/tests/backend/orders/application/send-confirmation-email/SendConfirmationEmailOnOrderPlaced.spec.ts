@@ -86,7 +86,20 @@ describe("orderConfirmationEmail should", () => {
 
 		expect(email.subject).toBe("Your order order-0001 is confirmed");
 		expect(email.html).toContain("Hi Jane Doe");
-		expect(email.html).toContain("its 3 items");
+		expect(email.html).toContain("We will send 3 items to your home");
 		expect(email.html).toContain("Total: €128.00");
+	});
+
+	it("use the singular for an order with one item", () => {
+		const email = orderConfirmationEmail({
+			to: "jane.doe@codely.com",
+			customerName: "Jane Doe",
+			orderId: "order-0001",
+			items: 1,
+			totalAmount: 39,
+			currency: "EUR",
+		});
+
+		expect(email.html).toContain("We will send 1 item to your home");
 	});
 });
