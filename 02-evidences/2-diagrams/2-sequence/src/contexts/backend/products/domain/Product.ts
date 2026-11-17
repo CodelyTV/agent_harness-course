@@ -56,6 +56,24 @@ export class Product {
 		);
 	}
 
+	withStockDecreased(variantId: string, quantity: number): Product {
+		return new Product(
+			this.id,
+			this.name,
+			this.collection,
+			this.category,
+			this.description,
+			this.price,
+			this.badges,
+			this.accent,
+			this.variants.map((variant) =>
+				variant.id === variantId
+					? variant.withStockDecreasedBy(quantity)
+					: variant,
+			),
+		);
+	}
+
 	variant(variantId: string): ProductVariant | undefined {
 		return this.variants.find((variant) => variant.id === variantId);
 	}
