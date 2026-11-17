@@ -25,4 +25,6 @@ There is no linter configured.
 
 `.env.local` (optional): `DATABASE_URL` (default `postgres://retail:retail@localhost:55432/retail`) and `POSTGRES_PORT`. No API keys are required.
 
+Emails are not sent: `FileSystemEmailSender` writes each one as an HTML file in `emails/` (git-ignored).
+
 Note for the workshop exercises: inside an exercise, `./cly start` wraps `db:up` + `db:reset` + `dev`, and `./cly test` wraps `test`.
