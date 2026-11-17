@@ -9,11 +9,11 @@ export type ProductReviewThanksEmailParams = {
 
 const template = `<!doctype html>
 <html lang="en">
-	<body style="margin: 0; padding: 32px; background: #f4f3ee; font-family: Helvetica, Arial, sans-serif; color: #1c2230;">
+	<body style="margin: 0; padding: 32px 16px; background: #f4f3ee; font-family: Helvetica, Arial, sans-serif; color: #1c2230;">
 		<table role="presentation" width="100%" cellpadding="0" cellspacing="0">
 			<tr>
 				<td align="center">
-					<table role="presentation" width="480" cellpadding="0" cellspacing="0" style="background: #ffffff; border-radius: 16px; padding: 32px;">
+					<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width: 480px; background: #ffffff; border-radius: 16px; padding: 32px;">
 						<tr>
 							<td>
 								<p style="margin: 0 0 8px; font-size: 12px; letter-spacing: 2px; color: #6b7280;">CODELY ATELIER</p>
