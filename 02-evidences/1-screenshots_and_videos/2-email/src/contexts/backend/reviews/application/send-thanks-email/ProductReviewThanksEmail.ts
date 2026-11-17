@@ -36,6 +36,12 @@ function render(values: Record<string, string>): string {
 	);
 }
 
+const maxRating = 5;
+
+function stars(rating: number): string {
+	return "★".repeat(rating) + "☆".repeat(maxRating - rating);
+}
+
 export function productReviewThanksEmail(
 	params: ProductReviewThanksEmailParams,
 ): Email {
@@ -45,6 +51,7 @@ export function productReviewThanksEmail(
 		html: render({
 			customerName: params.customerName,
 			productName: params.productName,
+			rating: stars(params.rating),
 		}),
 	};
 }
