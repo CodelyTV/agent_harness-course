@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import { retailContainer } from "@/contexts/backend/shared/infrastructure/RetailContainer";
+import { Button } from "@/contexts/frontend/design-system/atoms/Button";
 import {
 	formatDeliveryMethod,
 	formatMoney,
@@ -80,6 +81,7 @@ export default async function AccountOrderDetailPage({
 							<th>Variant</th>
 							<th>Units</th>
 							<th className={styles.right}>Line total</th>
+							<th className={styles.right}>Review</th>
 						</tr>
 					</thead>
 					<tbody>
@@ -97,6 +99,15 @@ export default async function AccountOrderDetailPage({
 											line.quantity,
 										currency: "EUR",
 									})}
+								</td>
+								<td className={styles.right}>
+									<Button
+										href={`/products/${line.productId}#reviews-heading`}
+										mode="secondary"
+										size="x-small"
+									>
+										✍️ Write a review
+									</Button>
 								</td>
 							</tr>
 						))}
