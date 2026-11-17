@@ -9,6 +9,7 @@ import { OrdersLister } from "@/contexts/backend/orders/application/list/OrdersL
 import { UserOrdersLister } from "@/contexts/backend/orders/application/list-mine/UserOrdersLister";
 import { OrderPlacer } from "@/contexts/backend/orders/application/place/OrderPlacer";
 import { PostgresOrderRepository } from "@/contexts/backend/orders/infrastructure/PostgresOrderRepository";
+import { BoughtTogetherProductsSearcher } from "@/contexts/backend/products/application/bought-together/BoughtTogetherProductsSearcher";
 import { CategoriesLister } from "@/contexts/backend/products/application/categories/CategoriesLister";
 import { ProductFinder } from "@/contexts/backend/products/application/find/ProductFinder";
 import { InventoryLister } from "@/contexts/backend/products/application/inventory/InventoryLister";
@@ -80,6 +81,13 @@ class RetailContainer {
 
 	get productsSearcher(): ProductsSearcher {
 		return new ProductsSearcher(this.productRepository);
+	}
+
+	get boughtTogetherProductsSearcher(): BoughtTogetherProductsSearcher {
+		return new BoughtTogetherProductsSearcher(
+			this.orderRepository,
+			this.productRepository,
+		);
 	}
 
 	get productFinder(): ProductFinder {
