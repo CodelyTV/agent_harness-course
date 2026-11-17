@@ -4,7 +4,6 @@ export type ProductReviewThanksEmailParams = {
 	to: string;
 	customerName: string;
 	productName: string;
-	rating: number;
 };
 
 const template = `<!doctype html>
@@ -18,8 +17,7 @@ const template = `<!doctype html>
 							<td>
 								<p style="margin: 0 0 8px; font-size: 12px; letter-spacing: 2px; color: #6b7280;">CODELY ATELIER</p>
 								<h1 style="margin: 0 0 16px; font-size: 24px;">Thanks for your review</h1>
-								<p style="margin: 0 0 16px; font-size: 16px; line-height: 1.5;">Hi {{customerName}}, your review of <strong>{{productName}}</strong> is now published. It helps other customers pick the right fit.</p>
-								<p style="margin: 0; font-size: 18px; font-weight: bold;">Your rating: {{rating}}</p>
+								<p style="margin: 0; font-size: 16px; line-height: 1.5;">Hi {{customerName}}, your review of <strong>{{productName}}</strong> is now published. It helps other customers pick the right fit.</p>
 							</td>
 						</tr>
 					</table>

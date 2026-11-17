@@ -37,7 +37,6 @@ export class ProductReviewThanksEmailSender {
 				to: user.email,
 				customerName: user.name,
 				productName: product.name,
-				rating: review.rating.value,
 			}),
 		);
 	}

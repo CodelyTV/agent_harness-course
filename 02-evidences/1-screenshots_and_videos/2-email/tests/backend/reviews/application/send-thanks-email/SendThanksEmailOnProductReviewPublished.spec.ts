@@ -49,7 +49,6 @@ describe("SendThanksEmailOnProductReviewPublished should", () => {
 				to: "jane.doe@codely.com",
 				customerName: "Jane Doe",
 				productName: product.name,
-				rating: review.rating.value,
 			}),
 		);
 	});
@@ -61,7 +60,6 @@ describe("productReviewThanksEmail should", () => {
 			to: "jane.doe@codely.com",
 			customerName: "Jane Doe",
 			productName: "Hexagonal Overshirt",
-			rating: 4,
 		});
 
 		expect(email.subject).toBe("Thanks for reviewing Hexagonal Overshirt");
