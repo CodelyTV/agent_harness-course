@@ -4,6 +4,7 @@ export type ProductReviewThanksEmailParams = {
 	to: string;
 	customerName: string;
 	productName: string;
+	rating: number;
 };
 
 const template = `<!doctype html>
@@ -17,7 +18,8 @@ const template = `<!doctype html>
 							<td>
 								<p style="margin: 0 0 8px; font-size: 12px; letter-spacing: 2px; color: #6b7280;">CODELY ATELIER</p>
 								<h1 style="margin: 0 0 16px; font-size: 24px;">Thanks for your review</h1>
-								<p style="margin: 0; font-size: 16px; line-height: 1.5;">Hi {{customerName}}, your review of <strong>{{productName}}</strong> is now published. It helps other customers pick the right fit.</p>
+								<p style="margin: 0 0 16px; font-size: 16px; line-height: 1.5;">Hi {{customerName}}, your review of <strong>{{productName}}</strong> is now published. It helps other customers pick the right fit.</p>
+								<p style="margin: 0; font-size: 18px; font-weight: bold;">Your rating: {{rating}}</p>
 							</td>
 						</tr>
 					</table>
@@ -34,6 +36,12 @@ function render(values: Record<string, string>): string {
 	);
 }
 
+const maxRating = 5;
+
+function stars(rating: number): string {
+	return "★".repeat(rating) + "☆".repeat(maxRating - rating);
+}
+
 export function productReviewThanksEmail(
 	params: ProductReviewThanksEmailParams,
 ): Email {
@@ -43,6 +51,7 @@ export function productReviewThanksEmail(
 		html: render({
 			customerName: params.customerName,
 			productName: params.productName,
+			rating: stars(params.rating),
 		}),
 	};
 }

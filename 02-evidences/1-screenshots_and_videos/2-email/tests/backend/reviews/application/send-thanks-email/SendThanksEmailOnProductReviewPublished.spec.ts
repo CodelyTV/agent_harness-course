@@ -49,6 +49,7 @@ describe("SendThanksEmailOnProductReviewPublished should", () => {
 				to: "jane.doe@codely.com",
 				customerName: "Jane Doe",
 				productName: product.name,
+				rating: review.rating.value,
 			}),
 		);
 	});
@@ -60,10 +61,22 @@ describe("productReviewThanksEmail should", () => {
 			to: "jane.doe@codely.com",
 			customerName: "Jane Doe",
 			productName: "Hexagonal Overshirt",
+			rating: 4,
 		});
 
 		expect(email.subject).toBe("Thanks for reviewing Hexagonal Overshirt");
 		expect(email.html).toContain("Hi Jane Doe");
 		expect(email.html).toContain("Hexagonal Overshirt");
+	});
+
+	it("show the rating of the review as stars", () => {
+		const email = productReviewThanksEmail({
+			to: "jane.doe@codely.com",
+			customerName: "Jane Doe",
+			productName: "Hexagonal Overshirt",
+			rating: 4,
+		});
+
+		expect(email.html).toContain("Your rating: ★★★★☆");
 	});
 });
