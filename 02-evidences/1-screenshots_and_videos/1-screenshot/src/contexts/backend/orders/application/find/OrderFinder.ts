@@ -6,6 +6,7 @@ import { OrderId } from "../../domain/OrderId";
 import type { OrderRepository } from "../../domain/OrderRepository";
 
 export type OrderDetailLineResponse = {
+	productId: string;
 	productName: string;
 	color: string;
 	size: string;
@@ -51,6 +52,7 @@ export class OrderFinder {
 				const variant = product?.variant(line.variantId);
 
 				return {
+					productId: line.productId,
 					productName: product?.name ?? line.productId,
 					color: variant?.color ?? "",
 					size: variant?.size ?? "",

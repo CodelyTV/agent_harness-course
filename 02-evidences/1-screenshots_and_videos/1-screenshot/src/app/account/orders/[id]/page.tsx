@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import { retailContainer } from "@/contexts/backend/shared/infrastructure/RetailContainer";
+import { Button } from "@/contexts/frontend/design-system/atoms/Button";
 import {
 	formatDeliveryMethod,
 	formatMoney,
@@ -9,6 +10,8 @@ import {
 	variantLabel,
 } from "@/contexts/frontend/retail/ui/format";
 import styles from "@/contexts/frontend/retail/ui/orderTable.module.scss";
+
+import pageStyles from "./page.module.scss";
 
 export const dynamic = "force-dynamic";
 
@@ -87,7 +90,18 @@ export default async function AccountOrderDetailPage({
 							<tr
 								key={`${line.productName}-${line.color}-${line.size}`}
 							>
-								<td>{line.productName}</td>
+								<td>
+									<div className={pageStyles.product}>
+										{line.productName}
+										<Button
+											href={`/products/${line.productId}#reviews-heading`}
+											mode="secondary"
+											size="x-small"
+										>
+											✍️ Write a review
+										</Button>
+									</div>
+								</td>
 								<td>{variantLabel(line.color, line.size)}</td>
 								<td>{line.quantity}</td>
 								<td className={styles.right}>
