@@ -11,6 +11,8 @@ import {
 } from "@/contexts/frontend/retail/ui/format";
 import styles from "@/contexts/frontend/retail/ui/orderTable.module.scss";
 
+import pageStyles from "./page.module.scss";
+
 export const dynamic = "force-dynamic";
 
 const dateFormatter = new Intl.DateTimeFormat("en-GB", {
@@ -81,7 +83,6 @@ export default async function AccountOrderDetailPage({
 							<th>Variant</th>
 							<th>Units</th>
 							<th className={styles.right}>Line total</th>
-							<th className={styles.right}>Review</th>
 						</tr>
 					</thead>
 					<tbody>
@@ -89,7 +90,18 @@ export default async function AccountOrderDetailPage({
 							<tr
 								key={`${line.productName}-${line.color}-${line.size}`}
 							>
-								<td>{line.productName}</td>
+								<td>
+									<div className={pageStyles.product}>
+										{line.productName}
+										<Button
+											href={`/products/${line.productId}#reviews-heading`}
+											mode="secondary"
+											size="x-small"
+										>
+											✍️ Write a review
+										</Button>
+									</div>
+								</td>
 								<td>{variantLabel(line.color, line.size)}</td>
 								<td>{line.quantity}</td>
 								<td className={styles.right}>
@@ -99,15 +111,6 @@ export default async function AccountOrderDetailPage({
 											line.quantity,
 										currency: "EUR",
 									})}
-								</td>
-								<td className={styles.right}>
-									<Button
-										href={`/products/${line.productId}#reviews-heading`}
-										mode="secondary"
-										size="x-small"
-									>
-										✍️ Write a review
-									</Button>
 								</td>
 							</tr>
 						))}
