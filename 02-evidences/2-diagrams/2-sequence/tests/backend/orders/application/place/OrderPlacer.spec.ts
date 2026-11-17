@@ -2,15 +2,18 @@ import { describe, expect, it, vi } from "vitest";
 
 import { OrderPlacer } from "@/contexts/backend/orders/application/place/OrderPlacer";
 import type { Order } from "@/contexts/backend/orders/domain/Order";
+import { OrderPlacedDomainEvent } from "@/contexts/backend/orders/domain/OrderPlacedDomainEvent";
 import type { OrderRepository } from "@/contexts/backend/orders/domain/OrderRepository";
+import type { EventBus } from "@/contexts/shared/domain/event/EventBus";
 
 import { Mock } from "../../../../shared/Mock";
 
 describe("OrderPlacer should", () => {
 	const repository = Mock.create<OrderRepository>();
-	const placer = new OrderPlacer(repository);
+	const eventBus = Mock.create<EventBus>();
+	const placer = new OrderPlacer(repository, eventBus);
 
-	it("place a confirmed order with the subtotal computed from its lines", async () => {
+	it("place a confirmed order with the subtotal computed from its lines and notify it", async () => {
 		const orderId = await placer.place("user-aibuilder", "home-delivery", [
 			{
 				productId: "p1",
@@ -51,5 +54,16 @@ describe("OrderPlacer should", () => {
 				unitPriceAmount: 30,
 			},
 		]);
+
+		const published = (
+			eventBus.publish as unknown as ReturnType<typeof vi.fn>
+		).mock.calls[0][0] as OrderPlacedDomainEvent[];
+
+		expect(published).toHaveLength(1);
+		expect(published[0]).toBeInstanceOf(OrderPlacedDomainEvent);
+		expect(published[0].toPrimitives()).toEqual({
+			id: orderId,
+			userId: "user-aibuilder",
+		});
 	});
 });

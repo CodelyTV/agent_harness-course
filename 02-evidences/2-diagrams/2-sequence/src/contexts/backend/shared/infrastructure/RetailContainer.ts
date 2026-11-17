@@ -8,6 +8,8 @@ import { OrderFinder } from "@/contexts/backend/orders/application/find/OrderFin
 import { OrdersLister } from "@/contexts/backend/orders/application/list/OrdersLister";
 import { UserOrdersLister } from "@/contexts/backend/orders/application/list-mine/UserOrdersLister";
 import { OrderPlacer } from "@/contexts/backend/orders/application/place/OrderPlacer";
+import { OrderConfirmationEmailSender } from "@/contexts/backend/orders/application/send-confirmation-email/OrderConfirmationEmailSender";
+import { SendConfirmationEmailOnOrderPlaced } from "@/contexts/backend/orders/application/send-confirmation-email/SendConfirmationEmailOnOrderPlaced";
 import { PostgresOrderRepository } from "@/contexts/backend/orders/infrastructure/PostgresOrderRepository";
 import { CategoriesLister } from "@/contexts/backend/products/application/categories/CategoriesLister";
 import { ProductFinder } from "@/contexts/backend/products/application/find/ProductFinder";
@@ -28,6 +30,7 @@ import { PostgresUserRepository } from "@/contexts/backend/users/infrastructure/
 import type { DomainEvent } from "@/contexts/shared/domain/event/DomainEvent";
 import type { DomainEventSubscriber } from "@/contexts/shared/domain/event/DomainEventSubscriber";
 
+import { FileSystemEmailSender } from "./email/FileSystemEmailSender";
 import { InMemoryEventBus } from "./event-bus/InMemoryEventBus";
 import { PostgresConnection } from "./PostgresConnection";
 import { SystemClock } from "./SystemClock";
@@ -75,6 +78,13 @@ class RetailContainer {
 					this.eventBus,
 				),
 			),
+			new SendConfirmationEmailOnOrderPlaced(
+				new OrderConfirmationEmailSender(
+					this.orderRepository,
+					this.userRepository,
+					new FileSystemEmailSender(),
+				),
+			),
 		);
 	}
 
@@ -99,7 +109,7 @@ class RetailContainer {
 	}
 
 	get orderPlacer(): OrderPlacer {
-		return new OrderPlacer(this.orderRepository);
+		return new OrderPlacer(this.orderRepository, this.eventBus);
 	}
 
 	get ordersLister(): OrdersLister {

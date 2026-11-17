@@ -1,5 +1,7 @@
 import { randomUUID } from "node:crypto";
 
+import type { EventBus } from "@/contexts/shared/domain/event/EventBus";
+
 import { Order } from "../../domain/Order";
 import { OrderLine } from "../../domain/OrderLine";
 import type { OrderRepository } from "../../domain/OrderRepository";
@@ -12,7 +14,10 @@ export type PlaceOrderLine = {
 };
 
 export class OrderPlacer {
-	constructor(private readonly repository: OrderRepository) {}
+	constructor(
+		private readonly repository: OrderRepository,
+		private readonly eventBus: EventBus,
+	) {}
 
 	async place(
 		userId: string,
@@ -37,6 +42,7 @@ export class OrderPlacer {
 		);
 
 		await this.repository.save(order);
+		await this.eventBus.publish(order.pullDomainEvents());
 
 		return order.id.value;
 	}
