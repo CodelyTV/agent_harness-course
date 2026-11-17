@@ -41,20 +41,6 @@ function buildSizeGuide(
 	return rows;
 }
 
-async function relatedProducts(productId: string, collection: string) {
-	const all = await retailContainer.productsSearcher.search();
-	const sameCollection = all.filter(
-		(product) =>
-			product.id !== productId && product.collection === collection,
-	);
-	const others = all.filter(
-		(product) =>
-			product.id !== productId && product.collection !== collection,
-	);
-
-	return [...sameCollection, ...others].slice(0, 4);
-}
-
 export const dynamic = "force-dynamic";
 
 export default async function ProductPage({ params }: ProductPageProps) {
@@ -68,7 +54,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
 	const selectedVariantId = product.firstAvailableVariantId;
 	const sizeGuide = buildSizeGuide(product.variants);
 	const [related, reviews] = await Promise.all([
-		relatedProducts(product.id, product.collection),
+		retailContainer.boughtTogetherProductsSearcher.search(product.id),
 		retailContainer.allProductReviewsSearcher.search(product.id),
 	]);
 
@@ -167,9 +153,9 @@ export default async function ProductPage({ params }: ProductPageProps) {
 
 			{related.length > 0 ? (
 				<section className={styles.related}>
-					<p className="eyebrow">Collection</p>
+					<p className="eyebrow">Bought together</p>
 					<h2 className={styles.sectionHeading}>
-						You might also like
+						Customers also bought
 					</h2>
 					<div className={styles.relatedGrid}>
 						{related.map((item) => (
