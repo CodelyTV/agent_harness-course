@@ -1,0 +1,12 @@
+{
+  "version": 2,
+  "skills": {
+    "deterministify": {
+      "source": "CodelyTV/agent-harness",
+      "commit": "8629bd7f18306c81405741f8cca960bc60f7c101",
+      "sourceType": "github",
+      "skillPath": ".agents/skills/deterministify/SKILL.md",
+      "computedHash": "b961e79b5dfb4e855ec1a2ae43f18c9029acf33213f83fc99dc683dc19c7aa79"
+    }
+  }
+}
