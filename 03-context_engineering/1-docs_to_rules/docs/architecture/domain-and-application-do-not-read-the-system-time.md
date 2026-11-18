@@ -4,7 +4,7 @@
 
 Domain and application code (`src/contexts/**/domain/` and `src/contexts/**/application/`) never read the system time: no `new Date()` without arguments and no `Date.now()`.
 
-They receive the current time from the `Clock` port (`src/contexts/shared/domain/Clock.ts`). Only `SystemClock`, in infrastructure, reads the system time.
+They receive the current time from the `Clock` port (`src/contexts/shared/domain/Clock.ts`).
 
 Creating a date from a known value, such as `new Date(order.createdAt)`, is fine.
 
@@ -51,7 +51,7 @@ export class OrderPlacer {
 ## 🧐 Real world examples
 
 - [`ProductReviewCreator`](../../src/contexts/backend/reviews/application/create/ProductReviewCreator.ts) gets the creation date with `this.clock.now()`.
-- [`SystemClock`](../../src/contexts/backend/shared/infrastructure/SystemClock.ts) is the only place that reads the system time.
+- [`SystemClock`](../../src/contexts/backend/shared/infrastructure/SystemClock.ts) implements the `Clock` port in infrastructure.
 
 ## 🔗 Related agreements
 

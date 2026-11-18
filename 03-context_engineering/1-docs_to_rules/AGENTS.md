@@ -13,10 +13,9 @@ npm run test:integration
 
 # Architecture
 
-- Next.js 16 (App Router), Hexagonal Architecture, DDD.
-- Frontend routes and server actions in `src/app/` (`src/app/actions/`).
-- Backend business logic in `src/contexts/backend/`, split by bounded context (`products`, `checkout`, `orders`, `reviews`, `users`), each with `domain/application/infrastructure`.
-- Shared domain primitives in `src/contexts/shared/`.
+- Hexagonal architecture: each bounded context in `src/contexts/backend/` has `domain/`, `application/` and `infrastructure/` layers.
+- Domain and application code never import from `infrastructure/`. They depend on ports (abstract classes in `domain/`), and `RetailContainer` wires the infrastructure adapters.
+- Each use case does one business action. If a use case does two things, split it into two use cases.
 
 # Documentation
 
