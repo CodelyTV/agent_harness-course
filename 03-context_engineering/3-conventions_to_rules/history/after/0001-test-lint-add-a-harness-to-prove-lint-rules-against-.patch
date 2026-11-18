@@ -1,0 +1,85 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Irene Sanz <irene.sanz@example.com>
+Date: Mon, 16 Nov 2026 10:00:00 +0100
+Subject: [PATCH 1/6] test(lint): add a harness to prove lint rules against the
+ real configuration
+
+Co-Authored-By: Claude Code - Claude Opus 5.5 <noreply@anthropic.com>
+---
+ eslint.config.mjs      |  3 +++
+ tests/eslint/lintAs.ts | 49 ++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 52 insertions(+)
+ create mode 100644 tests/eslint/lintAs.ts
+
+diff --git a/eslint.config.mjs b/eslint.config.mjs
+index 2037c14..aa6128e 100644
+--- a/eslint.config.mjs
++++ b/eslint.config.mjs
+@@ -2,6 +2,9 @@ import eslintConfigNext from "@next/eslint-plugin-next";
+ import eslintConfigCodely from "eslint-config-codely";
+ import globals from "globals";
+ 
++// Baseline: eslint-suppressions.json lists the code that broke a rule the day the rule arrived.
++// It only shrinks: `eslint .` fails when an entry no longer occurs. Migrate a file, then run `npx eslint . --prune-suppressions`.
++
+ export default [
+ 	...eslintConfigCodely.course,
+ 	{
+diff --git a/tests/eslint/lintAs.ts b/tests/eslint/lintAs.ts
+new file mode 100644
+index 0000000..adb180f
+--- /dev/null
++++ b/tests/eslint/lintAs.ts
+@@ -0,0 +1,49 @@
++import { ESLint, type Linter } from "eslint";
++import { existsSync } from "node:fs";
++import { mkdir, rm, writeFile } from "node:fs/promises";
++import path from "node:path";
++
++const eslint = new ESLint({ cwd: process.cwd() });
++
++function firstMissingAncestor(directory: string): string | null {
++	let missing: string | null = null;
++	let current = directory;
++
++	while (!existsSync(current)) {
++		missing = current;
++		current = path.dirname(current);
++	}
++
++	return missing;
++}
++
++export async function lintAs(
++	filePath: string,
++	code: string,
++): Promise<Linter.LintMessage[]> {
++	const absolutePath = path.resolve(filePath);
++
++	if (existsSync(absolutePath)) {
++		throw new Error(
++			`${filePath} already exists: pick a path that no real file uses`,
++		);
++	}
++
++	const createdDirectory = firstMissingAncestor(path.dirname(absolutePath));
++
++	await mkdir(path.dirname(absolutePath), { recursive: true });
++	await writeFile(absolutePath, code);
++
++	try {
++		const [result] = await eslint.lintText(code, {
++			filePath: absolutePath,
++		});
++
++		return result.messages;
++	} finally {
++		await rm(createdDirectory ?? absolutePath, {
++			recursive: true,
++			force: true,
++		});
++	}
++}
+-- 
+2.56.0
+

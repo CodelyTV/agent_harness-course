@@ -1,0 +1,119 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Irene Sanz <irene.sanz@example.com>
+Date: Mon, 16 Nov 2026 10:14:00 +0100
+Subject: [PATCH 3/6] chore(lint): forbid querying through the sql client of
+ src/lib/db
+
+Since the onion architecture, RetailContainer wires repositories that extend PostgresRepository. The two legacy services that still use src/lib/db are the baseline in eslint-suppressions.json.
+
+Co-Authored-By: Claude Code - Claude Opus 5.5 <noreply@anthropic.com>
+---
+ eslint-suppressions.json          |  6 +++++
+ eslint.config.mjs                 | 17 ++++++++++++
+ tests/eslint/rawSqlClient.spec.ts | 45 +++++++++++++++++++++++++++++++
+ 3 files changed, 68 insertions(+)
+ create mode 100644 tests/eslint/rawSqlClient.spec.ts
+
+diff --git a/eslint-suppressions.json b/eslint-suppressions.json
+index 3a9eb70..c8ca6f5 100644
+--- a/eslint-suppressions.json
++++ b/eslint-suppressions.json
+@@ -12,11 +12,17 @@
+   "src/services/NewsletterService.ts": {
+     "import/no-restricted-paths": {
+       "count": 1
++    },
++    "no-restricted-imports": {
++      "count": 1
+     }
+   },
+   "src/services/WishlistService.ts": {
+     "import/no-restricted-paths": {
+       "count": 1
++    },
++    "no-restricted-imports": {
++      "count": 1
+     }
+   }
+ }
+\ No newline at end of file
+diff --git a/eslint.config.mjs b/eslint.config.mjs
+index a04de39..137f1f9 100644
+--- a/eslint.config.mjs
++++ b/eslint.config.mjs
+@@ -59,4 +59,21 @@ export default [
+ 			],
+ 		},
+ 	},
++	{
++		files: ["src/**", "tests/**"],
++		rules: {
++			"no-restricted-imports": [
++				"error",
++				{
++					patterns: [
++						{
++							regex: "^(@/|(\\.\\./)+)lib/db$",
++							message:
++								"Do not query the database with the sql client of src/lib/db. Add a repository that extends PostgresRepository in the infrastructure folder of the context. Convention: src/contexts/backend/products/infrastructure/PostgresProductRepository.ts",
++						},
++					],
++				},
++			],
++		},
++	},
+ ];
+diff --git a/tests/eslint/rawSqlClient.spec.ts b/tests/eslint/rawSqlClient.spec.ts
+new file mode 100644
+index 0000000..51a8201
+--- /dev/null
++++ b/tests/eslint/rawSqlClient.spec.ts
+@@ -0,0 +1,45 @@
++import { describe, expect, it } from "vitest";
++
++import { lintAs } from "./lintAs";
++
++const rule = "no-restricted-imports";
++
++describe(rule, () => {
++	it("fails when a repository queries through the sql client of src/lib/db", async () => {
++		const messages = await lintAs(
++			"src/contexts/backend/rule-test-raw-sql/infrastructure/PostgresWishlistRepository.ts",
++			[
++				'import { sql } from "../../../../lib/db";',
++				"",
++				"export async function wishlistSize(): Promise<number> {",
++				"\tconst rows = await sql`select 1 from wishlist_items`;",
++				"",
++				"\treturn rows.length;",
++				"}",
++				"",
++			].join("\n"),
++		);
++
++		expect(messages.map((message) => message.ruleId)).toContain(rule);
++	}, 30_000);
++
++	it("passes when a repository extends PostgresRepository", async () => {
++		const messages = await lintAs(
++			"src/contexts/backend/rule-test-raw-sql/infrastructure/PostgresWishlistRepository.ts",
++			[
++				'import { PostgresRepository } from "@/contexts/backend/shared/infrastructure/PostgresRepository";',
++				"",
++				"export class PostgresWishlistRepository extends PostgresRepository {",
++				"\tasync size(): Promise<number> {",
++				"\t\tconst rows = await this.sql`select 1 from wishlist_items`;",
++				"",
++				"\t\treturn rows.length;",
++				"\t}",
++				"}",
++				"",
++			].join("\n"),
++		);
++
++		expect(messages).toEqual([]);
++	}, 30_000);
++});
+-- 
+2.56.0
+

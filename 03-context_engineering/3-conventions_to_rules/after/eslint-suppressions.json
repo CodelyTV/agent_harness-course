@@ -1,0 +1,54 @@
+{
+  "src/app/api/newsletter/route.ts": {
+    "import/no-restricted-paths": {
+      "count": 1
+    },
+    "no-restricted-syntax": {
+      "count": 1
+    }
+  },
+  "src/app/api/wishlist/route.ts": {
+    "import/no-restricted-paths": {
+      "count": 1
+    },
+    "no-restricted-syntax": {
+      "count": 1
+    }
+  },
+  "src/contexts/backend/orders/application/place/OrderPlacer.ts": {
+    "no-restricted-syntax": {
+      "count": 1
+    }
+  },
+  "src/contexts/backend/orders/domain/OrderLine.ts": {
+    "no-restricted-syntax": {
+      "count": 1
+    }
+  },
+  "src/contexts/backend/users/application/current/CurrentUserGetter.ts": {
+    "no-restricted-syntax": {
+      "count": 1
+    }
+  },
+  "src/contexts/shared/domain/event/DomainEvent.ts": {
+    "retail/no-system-time": {
+      "count": 1
+    }
+  },
+  "src/services/NewsletterService.ts": {
+    "import/no-restricted-paths": {
+      "count": 1
+    },
+    "no-restricted-imports": {
+      "count": 1
+    }
+  },
+  "src/services/WishlistService.ts": {
+    "import/no-restricted-paths": {
+      "count": 1
+    },
+    "no-restricted-imports": {
+      "count": 1
+    }
+  }
+}

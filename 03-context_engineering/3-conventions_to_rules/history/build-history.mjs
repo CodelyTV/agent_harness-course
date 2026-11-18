@@ -12,7 +12,7 @@ import { dirname, join, relative, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const sourceDir = dirname(fileURLToPath(import.meta.url));
-const finalDir = join(sourceDir, "final");
+const finalDir = join(sourceDir, "..", "before");
 const legacyDir = join(sourceDir, "legacy");
 
 const authors = {

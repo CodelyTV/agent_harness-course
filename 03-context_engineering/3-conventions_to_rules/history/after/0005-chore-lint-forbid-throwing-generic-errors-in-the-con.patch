@@ -1,0 +1,119 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Irene Sanz <irene.sanz@example.com>
+Date: Mon, 16 Nov 2026 10:28:00 +0100
+Subject: [PATCH 5/6] chore(lint): forbid throwing generic errors in the
+ contexts
+
+Domain errors extend CodelyError and live in the domain/errors folder of their context (db74212). OrderLine, OrderPlacer and CurrentUserGetter still throw a generic Error: they are the baseline in eslint-suppressions.json.
+
+Co-Authored-By: Claude Code - Claude Opus 5.5 <noreply@anthropic.com>
+---
+ eslint-suppressions.json          | 15 +++++++++++
+ eslint.config.mjs                 | 14 ++++++++++
+ tests/eslint/domainErrors.spec.ts | 45 +++++++++++++++++++++++++++++++
+ 3 files changed, 74 insertions(+)
+ create mode 100644 tests/eslint/domainErrors.spec.ts
+
+diff --git a/eslint-suppressions.json b/eslint-suppressions.json
+index 0feaad3..cbaa675 100644
+--- a/eslint-suppressions.json
++++ b/eslint-suppressions.json
+@@ -15,6 +15,21 @@
+       "count": 1
+     }
+   },
++  "src/contexts/backend/orders/application/place/OrderPlacer.ts": {
++    "no-restricted-syntax": {
++      "count": 1
++    }
++  },
++  "src/contexts/backend/orders/domain/OrderLine.ts": {
++    "no-restricted-syntax": {
++      "count": 1
++    }
++  },
++  "src/contexts/backend/users/application/current/CurrentUserGetter.ts": {
++    "no-restricted-syntax": {
++      "count": 1
++    }
++  },
+   "src/services/NewsletterService.ts": {
+     "import/no-restricted-paths": {
+       "count": 1
+diff --git a/eslint.config.mjs b/eslint.config.mjs
+index 2f5b168..7269084 100644
+--- a/eslint.config.mjs
++++ b/eslint.config.mjs
+@@ -89,4 +89,18 @@ export default [
+ 			],
+ 		},
+ 	},
++	{
++		files: ["src/contexts/**/*.{ts,tsx}"],
++		rules: {
++			"no-restricted-syntax": [
++				"error",
++				{
++					selector:
++						"ThrowStatement > :matches(NewExpression, CallExpression)[callee.name='Error']",
++					message:
++						"Throw a domain error: a class in the domain/errors folder of the context that extends CodelyError. Convention: src/contexts/backend/checkout/domain/errors/VariantNotFoundError.ts",
++				},
++			],
++		},
++	},
+ ];
+diff --git a/tests/eslint/domainErrors.spec.ts b/tests/eslint/domainErrors.spec.ts
+new file mode 100644
+index 0000000..0d4ec00
+--- /dev/null
++++ b/tests/eslint/domainErrors.spec.ts
+@@ -0,0 +1,45 @@
++import { describe, expect, it } from "vitest";
++
++import { lintAs } from "./lintAs";
++
++const rule = "no-restricted-syntax";
++
++describe(`${rule} on errors thrown in the contexts`, () => {
++	it("fails when a use case throws a generic Error", async () => {
++		const messages = await lintAs(
++			"src/contexts/backend/rule-test-domain-errors/application/WishlistAdder.ts",
++			[
++				"export class WishlistAdder {",
++				"\tadd(productId: string): void {",
++				"\t\tif (productId.length === 0) {",
++				'\t\t\tthrow new Error("A product id is required");',
++				"\t\t}",
++				"\t}",
++				"}",
++				"",
++			].join("\n"),
++		);
++
++		expect(messages.map((message) => message.ruleId)).toContain(rule);
++	}, 30_000);
++
++	it("passes when a use case throws a domain error", async () => {
++		const messages = await lintAs(
++			"src/contexts/backend/rule-test-domain-errors/application/WishlistAdder.ts",
++			[
++				'import { VariantNotFoundError } from "@/contexts/backend/checkout/domain/errors/VariantNotFoundError";',
++				"",
++				"export class WishlistAdder {",
++				"\tadd(variantId: string): void {",
++				"\t\tif (variantId.length === 0) {",
++				"\t\t\tthrow new VariantNotFoundError(variantId);",
++				"\t\t}",
++				"\t}",
++				"}",
++				"",
++			].join("\n"),
++		);
++
++		expect(messages).toEqual([]);
++	}, 30_000);
++});
+-- 
+2.56.0
+

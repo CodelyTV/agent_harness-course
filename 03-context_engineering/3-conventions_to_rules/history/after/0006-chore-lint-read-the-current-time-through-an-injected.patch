@@ -1,0 +1,185 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Irene Sanz <irene.sanz@example.com>
+Date: Mon, 16 Nov 2026 10:35:00 +0100
+Subject: [PATCH 6/6] chore(lint): read the current time through an injected
+ Clock in the backend
+
+Use cases take a Clock (OrderPlacer, ProductReviewCreator) and SystemClock is the only adapter that reads the system time. A local ESLint plugin hosts the rule, since no-restricted-syntax already serves another convention on these files. DomainEvent is the baseline in eslint-suppressions.json.
+
+Co-Authored-By: Claude Code - Claude Opus 5.5 <noreply@anthropic.com>
+---
+ eslint-suppressions.json            |  5 +++
+ eslint.config.mjs                   | 12 ++++++
+ etc/eslint/plugin.mjs               | 10 +++++
+ etc/eslint/rules/no-system-time.mjs | 29 ++++++++++++++
+ tests/eslint/noSystemTime.spec.ts   | 61 +++++++++++++++++++++++++++++
+ 5 files changed, 117 insertions(+)
+ create mode 100644 etc/eslint/plugin.mjs
+ create mode 100644 etc/eslint/rules/no-system-time.mjs
+ create mode 100644 tests/eslint/noSystemTime.spec.ts
+
+diff --git a/eslint-suppressions.json b/eslint-suppressions.json
+index cbaa675..e7445ab 100644
+--- a/eslint-suppressions.json
++++ b/eslint-suppressions.json
+@@ -30,6 +30,11 @@
+       "count": 1
+     }
+   },
++  "src/contexts/shared/domain/event/DomainEvent.ts": {
++    "retail/no-system-time": {
++      "count": 1
++    }
++  },
+   "src/services/NewsletterService.ts": {
+     "import/no-restricted-paths": {
+       "count": 1
+diff --git a/eslint.config.mjs b/eslint.config.mjs
+index 7269084..df03f62 100644
+--- a/eslint.config.mjs
++++ b/eslint.config.mjs
+@@ -2,6 +2,8 @@ import eslintConfigNext from "@next/eslint-plugin-next";
+ import eslintConfigCodely from "eslint-config-codely";
+ import globals from "globals";
+ 
++import { retailPlugin } from "./etc/eslint/plugin.mjs";
++
+ // Baseline: eslint-suppressions.json lists the code that broke a rule the day the rule arrived.
+ // It only shrinks: `eslint .` fails when an entry no longer occurs. Migrate a file, then run `npx eslint . --prune-suppressions`.
+ 
+@@ -103,4 +105,14 @@ export default [
+ 			],
+ 		},
+ 	},
++	{
++		files: ["src/contexts/backend/**/*.ts", "src/contexts/shared/**/*.ts"],
++		ignores: ["src/contexts/backend/shared/infrastructure/SystemClock.ts"],
++		plugins: {
++			retail: retailPlugin,
++		},
++		rules: {
++			"retail/no-system-time": "error",
++		},
++	},
+ ];
+diff --git a/etc/eslint/plugin.mjs b/etc/eslint/plugin.mjs
+new file mode 100644
+index 0000000..326fcdf
+--- /dev/null
++++ b/etc/eslint/plugin.mjs
+@@ -0,0 +1,10 @@
++import { noSystemTime } from "./rules/no-system-time.mjs";
++
++export const retailPlugin = {
++	meta: {
++		name: "eslint-plugin-retail",
++	},
++	rules: {
++		"no-system-time": noSystemTime,
++	},
++};
+diff --git a/etc/eslint/rules/no-system-time.mjs b/etc/eslint/rules/no-system-time.mjs
+new file mode 100644
+index 0000000..01fd008
+--- /dev/null
++++ b/etc/eslint/rules/no-system-time.mjs
+@@ -0,0 +1,29 @@
++const message =
++	"Do not read the system time here: inject a Clock and call clock.now(). SystemClock is the only adapter that reads it. Convention: src/contexts/backend/reviews/application/create/ProductReviewCreator.ts";
++
++export const noSystemTime = {
++	meta: {
++		type: "problem",
++		docs: {
++			description: "Read the current time through an injected Clock",
++		},
++		schema: [],
++		messages: {
++			systemTime: message,
++		},
++	},
++	create(context) {
++		return {
++			"NewExpression[callee.type='Identifier'][callee.name='Date'][arguments.length=0]"(
++				node,
++			) {
++				context.report({ node, messageId: "systemTime" });
++			},
++			"CallExpression[callee.type='MemberExpression'][callee.object.name='Date'][callee.property.name='now']"(
++				node,
++			) {
++				context.report({ node, messageId: "systemTime" });
++			},
++		};
++	},
++};
+diff --git a/tests/eslint/noSystemTime.spec.ts b/tests/eslint/noSystemTime.spec.ts
+new file mode 100644
+index 0000000..0053b4e
+--- /dev/null
++++ b/tests/eslint/noSystemTime.spec.ts
+@@ -0,0 +1,61 @@
++import { describe, expect, it } from "vitest";
++
++import { lintAs } from "./lintAs";
++
++const rule = "retail/no-system-time";
++const filePath =
++	"src/contexts/backend/rule-test-system-time/application/WishlistAdder.ts";
++
++describe(rule, () => {
++	it("fails when a use case creates a Date for now", async () => {
++		const messages = await lintAs(
++			filePath,
++			[
++				"export function addedAt(): string {",
++				"\treturn new Date().toISOString();",
++				"}",
++				"",
++			].join("\n"),
++		);
++
++		expect(messages.map((message) => message.ruleId)).toContain(rule);
++	}, 30_000);
++
++	it("fails when a use case calls Date.now", async () => {
++		const messages = await lintAs(
++			filePath,
++			[
++				"export function addedAt(): number {",
++				"\treturn Date.now();",
++				"}",
++				"",
++			].join("\n"),
++		);
++
++		expect(messages.map((message) => message.ruleId)).toContain(rule);
++	}, 30_000);
++
++	it("passes when a use case asks an injected Clock and parses dates", async () => {
++		const messages = await lintAs(
++			filePath,
++			[
++				'import type { Clock } from "@/contexts/shared/domain/Clock";',
++				"",
++				"export class WishlistAdder {",
++				"\tconstructor(private readonly clock: Clock) {}",
++				"",
++				"\taddedAt(): string {",
++				"\t\treturn this.clock.now();",
++				"\t}",
++				"",
++				"\tyearOf(date: string): number {",
++				"\t\treturn new Date(date).getFullYear();",
++				"\t}",
++				"}",
++				"",
++			].join("\n"),
++		);
++
++		expect(messages).toEqual([]);
++	}, 30_000);
++});
+-- 
+2.56.0
+

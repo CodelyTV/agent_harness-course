@@ -1,0 +1,121 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Irene Sanz <irene.sanz@example.com>
+Date: Mon, 16 Nov 2026 10:07:00 +0100
+Subject: [PATCH 2/6] chore(lint): forbid new imports of the legacy services
+ and models
+
+src/services and src/models are legacy since the onion architecture (0f9d304): new features go to src/contexts. The four files that import them today are the baseline in eslint-suppressions.json.
+
+Co-Authored-By: Claude Code - Claude Opus 5.5 <noreply@anthropic.com>
+---
+ eslint-suppressions.json         | 22 ++++++++++++++++++
+ eslint.config.mjs                | 18 +++++++++++++++
+ tests/eslint/legacyLayer.spec.ts | 39 ++++++++++++++++++++++++++++++++
+ 3 files changed, 79 insertions(+)
+ create mode 100644 eslint-suppressions.json
+ create mode 100644 tests/eslint/legacyLayer.spec.ts
+
+diff --git a/eslint-suppressions.json b/eslint-suppressions.json
+new file mode 100644
+index 0000000..3a9eb70
+--- /dev/null
++++ b/eslint-suppressions.json
+@@ -0,0 +1,22 @@
++{
++  "src/app/api/newsletter/route.ts": {
++    "import/no-restricted-paths": {
++      "count": 1
++    }
++  },
++  "src/app/api/wishlist/route.ts": {
++    "import/no-restricted-paths": {
++      "count": 1
++    }
++  },
++  "src/services/NewsletterService.ts": {
++    "import/no-restricted-paths": {
++      "count": 1
++    }
++  },
++  "src/services/WishlistService.ts": {
++    "import/no-restricted-paths": {
++      "count": 1
++    }
++  }
++}
+\ No newline at end of file
+diff --git a/eslint.config.mjs b/eslint.config.mjs
+index aa6128e..a04de39 100644
+--- a/eslint.config.mjs
++++ b/eslint.config.mjs
+@@ -41,4 +41,22 @@ export default [
+ 			"import/no-unresolved": "off",
+ 		},
+ 	},
++	{
++		files: ["src/**", "tests/**"],
++		rules: {
++			"import/no-restricted-paths": [
++				"error",
++				{
++					zones: [
++						{
++							target: ["./src", "./tests"],
++							from: ["./src/services", "./src/models"],
++							message:
++								"src/services and src/models are legacy. Put the logic in a use case of src/contexts/backend/<context>/application and call it through RetailContainer. Convention: src/contexts/backend/products/application/find/ProductFinder.ts",
++						},
++					],
++				},
++			],
++		},
++	},
+ ];
+diff --git a/tests/eslint/legacyLayer.spec.ts b/tests/eslint/legacyLayer.spec.ts
+new file mode 100644
+index 0000000..2c64096
+--- /dev/null
++++ b/tests/eslint/legacyLayer.spec.ts
+@@ -0,0 +1,39 @@
++import { describe, expect, it } from "vitest";
++
++import { lintAs } from "./lintAs";
++
++const rule = "import/no-restricted-paths";
++
++describe(rule, () => {
++	it("fails when new code imports a legacy service", async () => {
++		const messages = await lintAs(
++			"src/app/actions/rule-test-legacy-layer/addToWishlist.ts",
++			[
++				'import { WishlistService } from "@/services/WishlistService";',
++				"",
++				"export async function addToWishlist(userId: string, productId: string): Promise<void> {",
++				"\tawait WishlistService.add(userId, productId);",
++				"}",
++				"",
++			].join("\n"),
++		);
++
++		expect(messages.map((message) => message.ruleId)).toContain(rule);
++	}, 30_000);
++
++	it("passes when new code calls a use case through the container", async () => {
++		const messages = await lintAs(
++			"src/app/actions/rule-test-legacy-layer/countCart.ts",
++			[
++				'import { retailContainer } from "@/contexts/backend/shared/infrastructure/RetailContainer";',
++				"",
++				"export async function countCart(): Promise<number> {",
++				"\treturn retailContainer.cartItemCounter.count();",
++				"}",
++				"",
++			].join("\n"),
++		);
++
++		expect(messages).toEqual([]);
++	}, 30_000);
++});
+-- 
+2.56.0
+
