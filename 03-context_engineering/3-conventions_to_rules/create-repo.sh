@@ -4,7 +4,7 @@ set -euo pipefail
 usage() {
 	echo "Usage: ./create-repo.sh <before|question|after> <target directory>" >&2
 	echo "  before    history up to the deterministify install, ready to run /deterministify conventions" >&2
-	echo "  question  before + a headless run that stops at the question, so 'claude --continue' resumes there" >&2
+	echo "  question  before + a headless run that stops at the question, to resume with 'claude --resume <id>'" >&2
 	echo "  after     before + the commits /deterministify conventions made after answering yes" >&2
 	exit 1
 }
@@ -32,7 +32,10 @@ npm install --no-audit --no-fund
 
 if [ "$mode" = "question" ]; then
 	echo "Running /deterministify conventions until it asks its question (about 15 minutes)…"
-	claude -p "/deterministify conventions" --permission-mode bypassPermissions
+	session_id="$(uuidgen | tr '[:upper:]' '[:lower:]')"
+	claude -p "/deterministify conventions" --session-id "$session_id" --permission-mode bypassPermissions
+	echo "$session_id" >.git/deterministify-session
 	echo
-	echo "Done. Run 'claude --continue' inside $target to answer the question."
+	echo "Done. To answer the question, run inside $target:"
+	echo "  claude --resume $session_id"
 fi
